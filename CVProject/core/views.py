@@ -2,10 +2,12 @@ from django.db.models import Prefetch
 
 from django.http import HttpResponse
 from django.template.loader import get_template
+from rest_framework import viewsets, generics
 from xhtml2pdf import pisa
 
 from django.views.generic import ListView, DetailView
 from .models import CV, Skill, Project
+from .serializers import CVSerializer
 
 
 class CVListView(ListView):
@@ -41,3 +43,13 @@ def cv_pdf(request, id):
     response['Content-Disposition'] = f'attachment; filename="cv_{cv.id}.pdf"'
     pisa.CreatePDF(html, dest=response)
     return response
+
+
+class CVListCreate(generics.ListCreateAPIView):  # GET / POST
+    queryset = CV.objects.all()
+    serializer_class = CVSerializer
+
+
+class CVRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):  # GET/PUT/PATCH/DELETE  WITH ID
+    queryset = CV.objects.all()
+    serializer_class = CVSerializer
