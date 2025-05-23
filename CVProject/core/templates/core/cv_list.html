@@ -1,0 +1,19 @@
+{% extends './base.html' %}
+
+{% block title %}CV List{% endblock %}
+
+{% block content %}
+    <h1>CV List</h1>
+    <div class="cv-grid">
+        {% for cv in cv_list %}
+            <div class="card">
+                <h2>{{ cv.first_name }} {{ cv.last_name }}</h2>
+                <p>{{ cv.bio|truncatechars:100 }}</p>
+                <a href="{% url 'cv_detail' cv.id %}">View Details</a>
+            </div>
+
+        {% empty %}
+            <div class="empty-message">No CVs found</div>
+        {% endfor %}
+    </div>
+{% endblock %}
