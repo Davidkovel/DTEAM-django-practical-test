@@ -1,0 +1,47 @@
+[
+  {
+    "model": "core.skill",
+    "pk": 1,
+    "fields": {
+      "name": "Git",
+      "proficiency": "Advanced",
+      "description": "Git description"
+    }
+  },
+  {
+    "model": "core.skill",
+    "pk": 2,
+    "fields": {
+      "name": "Django",
+      "proficiency": "Advanced",
+      "description": "Building web applications and REST APIs"
+    }
+  },
+  {
+    "model": "core.project",
+    "pk": 1,
+    "fields": {
+      "title": "Restaurant",
+      "description": "Django app",
+      "link": "https://example.com",
+      "technologies_used": "Django"
+    }
+  },
+  {
+    "model": "core.cv",
+    "pk": 1,
+    "fields": {
+      "first_name": "David",
+      "last_name": "Kovel",
+      "bio": "Experienced backend developer",
+      "contacts": "dkovel7@gmail.com",
+      "skills": [
+        1,
+        2
+      ],
+      "projects": [
+        1
+      ]
+    }
+  }
+]
