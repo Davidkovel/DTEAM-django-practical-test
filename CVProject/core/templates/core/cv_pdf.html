@@ -1,0 +1,31 @@
+{% extends './base.html' %}
+
+{% block title %}CV List{% endblock %}
+
+{% block content %}
+    <h1>{{ cv.firstname }} {{ cv.lastname }}</h1>
+    <div class="section">
+        <h2>Bio</h2>
+        <p>{{ cv.bio }}</p>
+    </div>
+    <div class="section">
+        <h2>Contact</h2>
+        <p>{{ cv.contacts }}</p>
+    </div>
+    <div class="section">
+        <h2>Skills</h2>
+        <ul>
+            {% for skill in cv.skills.all %}
+            <li>{{ skill.name }} ({{ skill.proficiency }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="section">
+        <h2>Projects</h2>
+        <ul>
+            {% for project in cv.projects.all %}
+            <li><strong>{{ project.title }}</strong>: {{ project.description }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
