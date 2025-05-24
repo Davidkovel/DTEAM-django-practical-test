@@ -1,6 +1,6 @@
 from datetime import timezone, datetime
 
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 from .models import RequestLog
 
@@ -19,3 +19,7 @@ class RequestLogView(ListView):
 
     def get_queryset(self):
         return super().get_queryset().only('timestamp', 'method', 'path', 'query_params', 'remote_ip_address')
+
+
+class SettingsView(TemplateView):
+    template_name = "audit/settings.html"

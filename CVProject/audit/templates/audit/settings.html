@@ -1,0 +1,19 @@
+<!-- audit/templates/audit/settings.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Settings</title>
+</head>
+<body>
+    <h1>Django Settings</h1>
+
+    <h2>Debug Mode: {{ settings.DEBUG }}</h2>
+
+    <h3>All Settings:</h3>
+    <ul>
+        <li><strong>ALLOWED_HOSTS:</strong> {{ settings.ALLOWED_HOSTS }}</li>
+        <li><strong>DATABASES:</strong> {{ settings.DATABASES }}</li>
+        <li><strong>INSTALLED_APPS:</strong> {{ settings.INSTALLED_APPS }}</li>
+    </ul>
+</body>
+</html>
