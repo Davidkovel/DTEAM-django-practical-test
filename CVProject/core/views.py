@@ -62,3 +62,5 @@ def send_cv_pdf_view(request, cv_id):
         email = request.POST.get('email')
         send_cv_pdf.delay(cv_id, email)
         return redirect('cv_detail', pk=cv_id)
+
+

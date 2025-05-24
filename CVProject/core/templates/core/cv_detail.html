@@ -7,6 +7,41 @@
     <div class="card-header bg-primary text-white">
         <h1>{{ cv.first_name }} {{ cv.last_name }}</h1>
     </div>
+
+    <div class="translation-box mb-4 p-3 border rounded">
+        <h3>Translate CV</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <select id="language-select" class="form-select mb-2">
+                    <option value="">Select language</option>
+                    <option value="kw">Cornish</option>
+                    <option value="gv">Manx</option>
+                    <option value="br">Breton</option>
+                    <option value="iu">Inuktitut</option>
+                    <option value="kl">Kalaallisut</option>
+                    <option value="rom">Romani</option>
+                    <option value="oc">Occitan</option>
+                    <option value="lad">Ladino</option>
+                    <option value="se">Northern Sami</option>
+                    <!-- Добавьте другие языки по необходимости -->
+                </select>
+            </div>
+            <div class="col-md-6">
+                <button id="translate-btn" class="btn btn-primary w-100">
+                    Translate
+                </button>
+            </div>
+        </div>
+
+        <!-- Результат перевода -->
+        <div id="translation-result" class="mt-3 p-3 bg-light rounded" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4>Translated Version</h4>
+                <button id="close-translation" class="btn btn-sm btn-outline-secondary">×</button>
+            </div>
+            <div id="translated-content"></div>
+        </div>
+    </div>
     <div class="card-body">
         <h2 class="mb-4">Bio</h2>
         <p>{{ cv.bio }}</p>
@@ -50,4 +85,114 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const translateBtn = document.getElementById('translate-btn');
+    const languageSelect = document.getElementById('language-select');
+    const resultDiv = document.getElementById('translation-result');
+    const translatedContent = document.getElementById('translated-content');
+    const closeBtn = document.getElementById('close-translation');
+
+    translateBtn.addEventListener('click', function() {
+        const language = languageSelect.value;
+        if (!language) {
+            alert('Please select a language');
+            return;
+        }
+
+        // Собираем данные CV для перевода
+        const cvData = {
+            first_name: '{{ cv.first_name }}',
+            last_name: '{{ cv.last_name }}',
+            bio: '{{ cv.bio|escapejs }}',
+            skills: [
+                {% for skill in cv.skills.all %}
+                { name: '{{ skill.name|escapejs }}', proficiency: '{{ skill.proficiency|escapejs }}' },
+                {% endfor %}
+            ],
+            projects: [
+                {% for project in cv.projects.all %}
+                { title: '{{ project.title|escapejs }}', description: '{{ project.description|escapejs }}' },
+                {% endfor %}
+            ]
+        };
+
+        translateBtn.disabled = true;
+        translateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Translating...';
+
+        // Отправляем запрос на перевод
+        fetch('/cv/{{ cv.id }}/translate/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                language: language,
+                cv_data: cvData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.translated) {
+                // Отображаем переведенный контент
+                let html = `
+                    <h1>${data.translated.first_name} ${data.translated.last_name}</h1>
+                    <div class="section">
+                        <h2>Bio</h2>
+                        <p>${data.translated.bio}</p>
+                    </div>
+                    <div class="section">
+                        <h2>Skills</h2>
+                        <ul>
+                            ${data.translated.skills.map(skill =>
+                                `<li>${skill.name} (${skill.proficiency})</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <h2>Projects</h2>
+                        <ul>
+                            ${data.translated.projects.map(project =>
+                                `<li><strong>${project.title}</strong>: ${project.description}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                `;
+                translatedContent.innerHTML = html;
+                resultDiv.style.display = 'block';
+            } else if (data.error) {
+                alert('Translation error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Translation failed. Please try again.');
+        })
+        .finally(() => {
+            translateBtn.disabled = false;
+            translateBtn.textContent = 'Translate';
+        });
+    });
+
+    closeBtn.addEventListener('click', function() {
+        resultDiv.style.display = 'none';
+    });
+});
+</script>
+
+<style>
+.section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+.translation-box {
+    background-color: #f8f9fa;
+}
+#translation-result {
+    border: 1px solid #dee2e6;
+}
+</style>
 {% endblock %}
