@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recent Requests</title>
+</head>
+<body>
+    <h1>10 Last Requests </h1>
+    <ul>
+        <h2>Current Time: {{ now }}</h2>
+        {% for log in request_logs %}
+            <li>
+                {{ log.timestamp }} — {{ log.method }} — {{ log.path }} {{ log.remote_ip_address }}
+            </li>
+        {% empty %}
+            <li>No logs found</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
