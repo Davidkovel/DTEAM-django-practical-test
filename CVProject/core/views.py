@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.template.loader import get_template
 from rest_framework import viewsets, generics
 from xhtml2pdf import pisa
@@ -8,6 +9,7 @@ from xhtml2pdf import pisa
 from django.views.generic import ListView, DetailView
 from .models import CV, Skill, Project
 from .serializers import CVSerializer
+from .tasks import send_cv_pdf
 
 
 class CVListView(ListView):
@@ -53,3 +55,10 @@ class CVListCreate(generics.ListCreateAPIView):  # GET / POST
 class CVRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):  # GET/PUT/PATCH/DELETE  WITH ID
     queryset = CV.objects.all()
     serializer_class = CVSerializer
+
+
+def send_cv_pdf_view(request, cv_id):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        send_cv_pdf.delay(cv_id, email)
+        return redirect('cv_detail', pk=cv_id)
